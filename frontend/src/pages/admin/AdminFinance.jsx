@@ -46,24 +46,22 @@ export default function AdminFinance() {
           <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Financial Overview</h1>
           <p className="text-gray-400 mt-1">Track revenue and financial performance.</p>
         </div>
-        <button className="btn-premium btn-premium-secondary">
+        <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition" style={{ background: '#2A2A2A', border: '1px solid #374151', color: '#E5E7EB' }}>
           <Download className="h-4 w-4" /> Export Report
         </button>
       </div>
 
-      <div className="grid sm:grid-cols-3 gap-6 mb-10">
+      <div className="grid sm:grid-cols-3 gap-5 mb-8">
         {kpiCards.map((card, i) => {
           const Icon = card.icon;
           return (
-            <div key={i} className="kpi-card-premium ac-scale-in" style={{ animationDelay: `${i * 0.1}s` }}>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: card.bg }}>
-                  <Icon className="h-7 w-7" style={{ color: card.color }} />
-                </div>
-                <div>
-                  <p className="text-sm text-secondary uppercase tracking-wider mb-1">{card.label}</p>
-                  <p className="text-2xl font-bold count-up">{card.value}</p>
-                </div>
+            <div key={i} className="dark-card p-5 flex items-center gap-4 ac-scale-in" style={{ animationDelay: `${i * 0.1}s` }}>
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: card.bg }}>
+                <Icon className="h-7 w-7" style={{ color: card.color }} />
+              </div>
+              <div>
+                <p className="text-sm text-gray-400">{card.label}</p>
+                <p className="text-2xl font-bold text-white">{card.value}</p>
               </div>
             </div>
           );
@@ -72,7 +70,7 @@ export default function AdminFinance() {
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Pie Chart */}
-        <div className="card-premium p-6 ac-fade-in">
+        <div className="dark-card p-6 ac-fade-in">
           <h2 className="text-lg font-bold text-white mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>Revenue by Category</h2>
           <div className="h-64">
             {pieData.length > 0 ? (
@@ -93,8 +91,8 @@ export default function AdminFinance() {
         </div>
 
         {/* Recent Transactions */}
-        <div className="card-premium flex flex-col overflow-hidden ac-fade-in" style={{ animationDelay: '0.1s' }}>
-          <div className="p-5" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <div className="dark-card flex flex-col overflow-hidden ac-fade-in" style={{ animationDelay: '0.1s' }}>
+          <div className="p-5" style={{ borderBottom: '1px solid #2D2D2D' }}>
             <h2 className="text-lg font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Recent Transactions</h2>
           </div>
           <div className="flex-1 overflow-y-auto p-3">
