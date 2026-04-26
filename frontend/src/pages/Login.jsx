@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
-import { LogIn, Mail, Lock, Car } from 'lucide-react';
+import { LogIn, Mail, Lock, Car, ArrowRight } from 'lucide-react';
+import logo from '../assets/logo1.png';
 
 export default function Login() {
   const [loginType, setLoginType] = useState('user');
@@ -39,45 +40,37 @@ export default function Login() {
     <div
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
       style={{
-        background: 'linear-gradient(rgba(0,0,0,0.68), rgba(0,0,0,0.78)), url(https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80) center/cover no-repeat'
+        background: 'radial-gradient(circle at 20% 20%, rgba(30, 144, 255, 0.15), transparent), #0B0B0D'
       }}
     >
-      {/* Blur overlay */}
-      <div className="absolute inset-0" style={{ backdropFilter: 'blur(3px)' }} />
+      {/* Animated Background Elements */}
+      <div className="absolute top-20 right-20 w-96 h-96 bg-[#1E90FF] rounded-full blur-[120px] opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-20 left-20 w-96 h-96 bg-[#00E5FF] rounded-full blur-[120px] opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
 
       <div className="relative z-10 w-full max-w-md px-4 ac-enter">
         {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-11 h-11 bg-[#0A84FF] rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-            <Car className="text-white h-6 w-6" />
-          </div>
-          <span className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>AutoCare</span>
-        </div>
+        <Link to="/" className="flex items-center justify-center mb-8 group">
+          <img src={logo} alt="AutoCare Logo" className="h-20 transition-all duration-300 group-hover:scale-105" style={{ filter: 'drop-shadow(0 0 20px rgba(30, 144, 255, 0.4))' }} />
+        </Link>
 
-        {/* Glass card */}
-        <div
-          className="rounded-2xl p-8"
-          style={{
-            background: 'rgba(255,255,255,0.07)',
-            backdropFilter: 'blur(14px)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            boxShadow: '0 8px 40px rgba(0,0,0,0.5)'
-          }}
-        >
-          <h2 className="text-2xl font-bold text-white mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>Welcome Back</h2>
-          <p className="text-gray-400 text-sm mb-6">Sign in to your account to continue</p>
+        {/* Glass Card */}
+        <div className="card-glass p-8">
+          <h2 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Welcome Back
+          </h2>
+          <p className="text-secondary mb-8">Sign in to your account to continue</p>
 
           {/* Toggle */}
-          <div className="grid grid-cols-2 gap-1 rounded-xl p-1 mb-6" style={{ background: 'rgba(0,0,0,0.3)' }}>
+          <div className="grid grid-cols-2 gap-2 p-1 rounded-xl mb-8" style={{ background: 'rgba(255,255,255,0.03)' }}>
             {['user', 'admin'].map(type => (
               <button
                 key={type}
                 type="button"
                 onClick={() => { setLoginType(type); clearError(); setLocalError(''); }}
-                className={`rounded-lg py-2 text-sm font-semibold transition-all ${
+                className={`rounded-lg py-3 text-sm font-semibold transition-all duration-300 ${
                   loginType === type
-                    ? 'bg-[#0A84FF] text-white shadow-md shadow-blue-500/30'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-gradient-to-r from-[#1E90FF] to-[#00E5FF] text-white shadow-[0_0_20px_rgba(30,144,255,0.4)]'
+                    : 'text-secondary hover:text-white'
                 }`}
               >
                 {type === 'user' ? 'User Login' : 'Admin Login'}
@@ -86,54 +79,66 @@ export default function Login() {
           </div>
 
           {(error || localError) && (
-            <div className="mb-4 p-3 rounded-lg text-sm text-red-300" style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)' }}>
+            <div className="mb-6 p-4 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#F87171' }}>
               {localError || error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#6B6B70] pointer-events-none z-10" />
               <input
                 type="email" required placeholder="Email address"
                 value={email} onChange={e => setEmail(e.target.value)}
-                className="dark-input pl-10"
-                style={{ background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.1)', color: '#E5E7EB' }}
+                className="input-premium pl-12 w-full"
               />
             </div>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#6B6B70] pointer-events-none z-10" />
               <input
                 type="password" required placeholder="Password"
                 value={password} onChange={e => setPassword(e.target.value)}
-                className="dark-input pl-10"
-                style={{ background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.1)', color: '#E5E7EB' }}
+                className="input-premium pl-12 w-full"
               />
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
+              <label className="flex items-center gap-2 text-secondary cursor-pointer hover:text-white transition">
                 <input type="checkbox" className="rounded" /> Remember me
               </label>
-              <a href="#" className="text-[#0A84FF] hover:text-blue-300 transition">Forgot password?</a>
+              <a href="#" className="text-[#00E5FF] hover:text-[#1E90FF] transition">Forgot password?</a>
             </div>
 
             <button
               type="submit" disabled={isLoading}
-              className="btn-primary w-full flex items-center justify-center gap-2 py-3 mt-2"
+              className="btn-premium btn-premium-primary w-full py-4 text-base mt-2"
             >
-              <LogIn className="h-4 w-4" />
-              {isLoading ? 'Signing in...' : loginType === 'admin' ? 'Sign In as Admin' : 'Sign In'}
+              {isLoading ? (
+                <div className="spinner-premium mx-auto" style={{ width: '20px', height: '20px', borderWidth: '2px' }}></div>
+              ) : (
+                <>
+                  <LogIn className="h-5 w-5" />
+                  {loginType === 'admin' ? 'Sign In as Admin' : 'Sign In'}
+                  <ArrowRight className="h-5 w-5" />
+                </>
+              )}
             </button>
           </form>
 
           {loginType === 'user' && (
-            <p className="text-center text-gray-400 text-sm mt-5">
+            <p className="text-center text-secondary text-sm mt-6">
               Don't have an account?{' '}
-              <Link to="/register" className="text-[#0A84FF] hover:text-blue-300 font-medium transition">Create one</Link>
+              <Link to="/register" className="text-[#00E5FF] hover:text-[#1E90FF] font-semibold transition">
+                Create one
+              </Link>
             </p>
           )}
         </div>
+
+        {/* Back to Home */}
+        <Link to="/" className="block text-center text-secondary hover:text-white transition mt-6">
+          ← Back to Home
+        </Link>
       </div>
     </div>
   );

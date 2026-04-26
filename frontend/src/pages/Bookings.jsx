@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import useBookingStore from '../store/bookingStore';
-import { CalendarClock, Car, Calendar as CalendarIcon, Download, Clock, Info } from 'lucide-react';
+import { CalendarClock, Car, Calendar as CalendarIcon, Download, Clock, Info, X } from 'lucide-react';
 import BookingProgress from '../components/BookingProgress';
 import { jsPDF } from 'jspdf';
 import useAuthStore from '../store/authStore';
+import axios from 'axios';
 
 const calcNextService = (name, dateStr) => {
   if (!dateStr || !name) return 'a future date';
@@ -21,10 +22,31 @@ const calcNextService = (name, dateStr) => {
 
 export default function Bookings() {
   const { bookings, fetchBookings, isLoading } = useBookingStore();
-  const { user } = useAuthStore();
+  const { user, token } = useAuthStore();
   const [activeTab, setActiveTab] = useState('Upcoming');
+  const [cancellingId, setCancellingId] = useState(null);
 
   useEffect(() => { fetchBookings(); }, [fetchBookings]);
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) return;
+    
+    try {
+      setCancellingId(bookingId);
+      await axios.put(
+        `http://localhost:5000/api/bookings/${bookingId}/cancel`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      await fetchBookings();
+      alert('Booking cancelled successfully');
+    } catch (error) {
+      console.error('Cancel booking error:', error);
+      alert(error.response?.data?.message || 'Failed to cancel booking');
+    } finally {
+      setCancellingId(null);
+    }
+  };
 
   const handleDownloadInvoice = (booking) => {
     const doc = new jsPDF();
@@ -133,7 +155,14 @@ export default function Bookings() {
                     </button>
                   )}
                   {activeTab === 'Upcoming' && (
-                    <button className="flex items-center gap-1 text-xs text-red-400 font-medium hover:bg-red-500/10 px-3 py-1.5 rounded-lg transition">Cancel</button>
+                    <button 
+                      onClick={() => handleCancelBooking(booking.booking_id)}
+                      disabled={cancellingId === booking.booking_id}
+                      className="flex items-center gap-1 text-xs text-red-400 font-medium hover:bg-red-500/10 px-3 py-1.5 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                      {cancellingId === booking.booking_id ? 'Cancelling...' : 'Cancel'}
+                    </button>
                   )}
                 </div>
               </div>

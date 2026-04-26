@@ -49,3 +49,33 @@ exports.createBooking = async (req, res) => {
     res.status(500).json({ message: 'Error creating booking' });
   }
 };
+
+exports.cancelBooking = async (req, res) => {
+  try {
+    const booking = await Booking.findByPk(req.params.id);
+    
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+    
+    if (booking.user_id !== req.user.user_id) {
+      return res.status(403).json({ message: 'Unauthorized to cancel this booking' });
+    }
+    
+    if (booking.status === 'Cancelled') {
+      return res.status(400).json({ message: 'Booking is already cancelled' });
+    }
+    
+    if (booking.status === 'Completed') {
+      return res.status(400).json({ message: 'Cannot cancel a completed booking' });
+    }
+    
+    booking.status = 'Cancelled';
+    await booking.save();
+    
+    res.json({ message: 'Booking cancelled successfully', booking });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error cancelling booking' });
+  }
+};

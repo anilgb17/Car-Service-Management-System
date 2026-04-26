@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useBookingStore from '../store/bookingStore';
 import useVehicleStore from '../store/vehicleStore';
-import { Settings, Car, Calendar, CreditCard, ChevronRight, CheckCircle2, Wrench, Droplets, Zap, Shield } from 'lucide-react';
+import { Settings, Car, Calendar, CreditCard, ChevronRight, CheckCircle2, Wrench, Droplets, Zap, Shield, Plus } from 'lucide-react';
 
 const SERVICE_ICONS = { 'Oil': Droplets, 'Tire': Car, 'Battery': Zap, 'Engine': Settings, 'Brake': Shield, 'default': Wrench };
 const getIcon = (name) => {
@@ -13,12 +13,15 @@ const getIcon = (name) => {
 export default function BookService() {
   const [step, setStep] = useState(1);
   const { services, fetchServices, createBooking, isLoading: bookingLoading } = useBookingStore();
-  const { vehicles, fetchVehicles } = useVehicleStore();
+  const { vehicles, fetchVehicles, isLoading: vehiclesLoading } = useVehicleStore();
   const navigate = useNavigate();
 
   const [bookingData, setBookingData] = useState({ service_ids: [], vehicle_id: null, booking_date: '', booking_time: '', notes: '', total_price: 0 });
 
-  useEffect(() => { fetchServices(); fetchVehicles(); }, [fetchServices, fetchVehicles]);
+  useEffect(() => { 
+    fetchServices(); 
+    fetchVehicles(); 
+  }, [fetchServices, fetchVehicles]);
 
   const handleNext = () => setStep(s => s + 1);
   const handleBack = () => setStep(s => s - 1);
@@ -39,6 +42,22 @@ export default function BookService() {
 
   const selectedServices = services.filter(s => bookingData.service_ids.includes(s.service_id));
   const selectedVehicle = vehicles.find(v => v.vehicle_id === bookingData.vehicle_id);
+
+  // Show loading state while fetching initial data
+  if (bookingLoading && services.length === 0) {
+    return (
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Book a Service</h1>
+          <p className="text-gray-400 mt-1">Schedule your next maintenance or repair.</p>
+        </div>
+        <div className="card-premium p-12 text-center">
+          <div className="spinner-premium mx-auto mb-4"></div>
+          <p className="text-secondary">Loading services...</p>
+        </div>
+      </div>
+    );
+  }
 
   const steps = [
     { num: 1, icon: Settings, label: 'Service' },
@@ -81,7 +100,7 @@ export default function BookService() {
         </div>
       )}
 
-      <div className="dark-card p-6 sm:p-8">
+      <div className="card-premium p-6 sm:p-8">
         {/* Step 1: Services */}
         {step === 1 && (
           <div>
@@ -137,34 +156,45 @@ export default function BookService() {
           <div>
             <h2 className="text-xl font-bold text-white mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>Select Your Vehicle</h2>
             {vehicles.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-400 mb-4">No vehicles registered.</p>
-                <button onClick={() => navigate('/dashboard/vehicles')} className="text-[#0A84FF] font-medium hover:underline">Add a vehicle first</button>
+              <div className="text-center py-12">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#1E90FF]/20 to-[#00E5FF]/20 flex items-center justify-center mx-auto mb-6">
+                  <Car className="h-10 w-10 text-[#00E5FF]" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>No Vehicles Found</h3>
+                <p className="text-secondary mb-6 max-w-md mx-auto">You need to add a vehicle before booking a service.</p>
+                <button 
+                  onClick={() => navigate('/dashboard/vehicles')} 
+                  className="btn-premium btn-premium-primary"
+                >
+                  <Plus className="h-5 w-5" /> Add Your First Vehicle
+                </button>
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 gap-3 mb-6">
-                {vehicles.map(vehicle => {
-                  const isSelected = bookingData.vehicle_id === vehicle.vehicle_id;
-                  return (
-                    <div key={vehicle.vehicle_id} onClick={() => { setBookingData(p => ({...p, vehicle_id: vehicle.vehicle_id})); handleNext(); }}
-                      className="p-4 rounded-xl cursor-pointer transition-all"
-                      style={{ background: isSelected ? 'rgba(10,132,255,0.12)' : '#2A2A2A', border: `2px solid ${isSelected ? '#0A84FF' : '#374151'}` }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: '#1E1E1E' }}>
-                          <Car className="h-5 w-5 text-[#0A84FF]" />
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-white">{vehicle.make} {vehicle.model}</h3>
-                          <p className="text-gray-500 text-xs">{vehicle.year} • {vehicle.registration_number}</p>
+              <>
+                <div className="grid sm:grid-cols-2 gap-3 mb-6">
+                  {vehicles.map(vehicle => {
+                    const isSelected = bookingData.vehicle_id === vehicle.vehicle_id;
+                    return (
+                      <div key={vehicle.vehicle_id} onClick={() => { setBookingData(p => ({...p, vehicle_id: vehicle.vehicle_id})); handleNext(); }}
+                        className="p-4 rounded-xl cursor-pointer transition-all"
+                        style={{ background: isSelected ? 'rgba(10,132,255,0.12)' : '#2A2A2A', border: `2px solid ${isSelected ? '#0A84FF' : '#374151'}` }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: '#1E1E1E' }}>
+                            <Car className="h-5 w-5 text-[#0A84FF]" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-white">{vehicle.make} {vehicle.model}</h3>
+                            <p className="text-gray-500 text-xs">{vehicle.year} • {vehicle.registration_number}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+                <button onClick={handleBack} className="text-gray-500 hover:text-gray-300 text-sm font-medium transition">← Back</button>
+              </>
             )}
-            <button onClick={handleBack} className="text-gray-500 hover:text-gray-300 text-sm font-medium transition">← Back</button>
           </div>
         )}
 

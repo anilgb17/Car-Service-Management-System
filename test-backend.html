@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Test - AutoCare</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0B0B0D;
+            color: #fff;
+        }
+        .test-section {
+            background: #1C1C1F;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            border: 1px solid #374151;
+        }
+        button {
+            background: linear-gradient(135deg, #1E90FF, #00E5FF);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .result {
+            background: #0B0B0D;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            border: 1px solid #374151;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #22C55E;
+        }
+        .error {
+            color: #EF4444;
+        }
+        .info {
+            color: #1E90FF;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚗 AutoCare Backend Test</h1>
+    <p>Use this page to test if your backend is working correctly.</p>
+
+    <!-- Test 1: Server Status -->
+    <div class="test-section">
+        <h2>Test 1: Server Status</h2>
+        <p>Check if the backend server is running.</p>
+        <button onclick="testServerStatus()">Test Server</button>
+        <div id="server-result" class="result" style="display:none;"></div>
+    </div>
+
+    <!-- Test 2: Services Endpoint -->
+    <div class="test-section">
+        <h2>Test 2: Services Endpoint</h2>
+        <p>Fetch all services from the database.</p>
+        <button onclick="testServices()">Fetch Services</button>
+        <div id="services-result" class="result" style="display:none;"></div>
+    </div>
+
+    <!-- Test 3: Login -->
+    <div class="test-section">
+        <h2>Test 3: User Login</h2>
+        <p>Test login functionality.</p>
+        <input type="email" id="login-email" placeholder="Email" style="padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #374151; background: #0B0B0D; color: #fff; width: 250px;">
+        <input type="password" id="login-password" placeholder="Password" style="padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #374151; background: #0B0B0D; color: #fff; width: 250px;">
+        <br>
+        <button onclick="testLogin()">Login</button>
+        <div id="login-result" class="result" style="display:none;"></div>
+    </div>
+
+    <!-- Test 4: Vehicles (Requires Login) -->
+    <div class="test-section">
+        <h2>Test 4: Vehicles Endpoint</h2>
+        <p>Fetch user vehicles (requires login first).</p>
+        <button onclick="testVehicles()">Fetch Vehicles</button>
+        <div id="vehicles-result" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let authToken = null;
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.innerHTML = `<span class="${type}">${message}</span>`;
+        }
+
+        async function testServerStatus() {
+            showResult('server-result', '⏳ Testing server connection...', 'info');
+            try {
+                const response = await fetch('http://localhost:5000/');
+                const text = await response.text();
+                showResult('server-result', `✅ Server is running!\n\nResponse: ${text}`, 'success');
+            } catch (error) {
+                showResult('server-result', `❌ Server is not running!\n\nError: ${error.message}\n\nMake sure to run: cd backend && node server.js`, 'error');
+            }
+        }
+
+        async function testServices() {
+            showResult('services-result', '⏳ Fetching services...', 'info');
+            try {
+                const response = await fetch(`${API_URL}/services`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                const services = await response.json();
+                
+                if (services.length === 0) {
+                    showResult('services-result', `⚠️ No services found!\n\nRun: cd backend && node seed.js`, 'error');
+                } else {
+                    const serviceList = services.map(s => `- ${s.name} ($${s.base_price})`).join('\n');
+                    showResult('services-result', `✅ Found ${services.length} services!\n\n${serviceList}`, 'success');
+                }
+            } catch (error) {
+                showResult('services-result', `❌ Failed to fetch services!\n\nError: ${error.message}\n\nMake sure backend is running and services are seeded.`, 'error');
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            if (!email || !password) {
+                showResult('login-result', '⚠️ Please enter email and password', 'error');
+                return;
+            }
+
+            showResult('login-result', '⏳ Logging in...', 'info');
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Login failed');
+                }
+
+                authToken = data.token;
+                showResult('login-result', `✅ Login successful!\n\nUser: ${data.user.first_name} ${data.user.last_name}\nEmail: ${data.user.email}\nRole: ${data.user.role}\n\nToken saved! You can now test the Vehicles endpoint.`, 'success');
+            } catch (error) {
+                showResult('login-result', `❌ Login failed!\n\nError: ${error.message}`, 'error');
+            }
+        }
+
+        async function testVehicles() {
+            if (!authToken) {
+                showResult('vehicles-result', '⚠️ Please login first!', 'error');
+                return;
+            }
+
+            showResult('vehicles-result', '⏳ Fetching vehicles...', 'info');
+            try {
+                const response = await fetch(`${API_URL}/vehicles`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const vehicles = await response.json();
+
+                if (vehicles.length === 0) {
+                    showResult('vehicles-result', `✅ Connected successfully!\n\nNo vehicles found. Add a vehicle in the app.`, 'success');
+                } else {
+                    const vehicleList = vehicles.map(v => `- ${v.make} ${v.model} (${v.year}) - ${v.registration_number}`).join('\n');
+                    showResult('vehicles-result', `✅ Found ${vehicles.length} vehicle(s)!\n\n${vehicleList}`, 'success');
+                }
+            } catch (error) {
+                showResult('vehicles-result', `❌ Failed to fetch vehicles!\n\nError: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

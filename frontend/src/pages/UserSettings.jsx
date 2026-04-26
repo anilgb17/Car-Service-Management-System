@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import useAuthStore from '../store/authStore';
 import { Save, User, Lock, MapPin, Mail, Phone } from 'lucide-react';
+// Note: backgroundMode utility removed — dark theme is global
 
 export default function UserSettings() {
   const { user } = useAuthStore();

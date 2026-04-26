@@ -43,7 +43,7 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING(100),
   },
   role: {
-    type: DataTypes.ENUM('Customer', 'Admin', 'Technician'),
+    type: DataTypes.ENUM('Customer', 'Admin', 'Technician', 'Mechanic', 'Service Advisor', 'Manager'),
     defaultValue: 'Customer',
   },
   loyalty_points: {

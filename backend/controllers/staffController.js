@@ -5,7 +5,7 @@ exports.getStaff = async (req, res) => {
   try {
     const staffMembers = await User.findAll({
       where: {
-        role: ['Mechanic', 'Service Advisor', 'Manager']
+        role: ['Mechanic', 'Service Advisor', 'Manager', 'Technician']
       },
       attributes: { exclude: ['password_hash'] }
     });
