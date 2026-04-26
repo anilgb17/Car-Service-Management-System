@@ -76,15 +76,18 @@ const useAdminStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       const token = useAuthStore.getState().token;
-      await axios.delete(`${API_URL}/customers/${id}`, {
+      console.log('Deleting customer with ID:', id);
+      const response = await axios.delete(`${API_URL}/customers/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      console.log('Delete response:', response.data);
       set((state) => ({
         allCustomers: state.allCustomers.filter(c => c.user_id !== id),
         isLoading: false
       }));
       return true;
     } catch (error) {
+      console.error('Delete customer error:', error.response?.data || error.message);
       set({ error: error.response?.data?.message || 'Failed to delete customer', isLoading: false });
       return false;
     }

@@ -91,35 +91,39 @@ export default function AdminFinance() {
         </div>
 
         {/* Recent Transactions */}
-        <div className="dark-card flex flex-col overflow-hidden ac-fade-in" style={{ animationDelay: '0.1s' }}>
-          <div className="p-5" style={{ borderBottom: '1px solid #2D2D2D' }}>
-            <h2 className="text-lg font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Recent Transactions</h2>
-          </div>
-          <div className="flex-1 overflow-y-auto p-3">
-            {completedBookings.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">No completed transactions yet.</div>
-            ) : (
-              <div className="space-y-1">
-                {completedBookings.slice(0, 8).map((booking, index) => (
-                  <div key={booking.booking_id} className="flex justify-between items-center p-3 rounded-xl hover:bg-white/3 transition ac-fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
+        <div className="dark-card p-6 ac-fade-in" style={{ animationDelay: '0.1s' }}>
+          <h2 className="text-lg font-bold text-white mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>Recent Transactions</h2>
+          {completedBookings.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">No completed transactions yet.</div>
+          ) : (
+            <div className="grid gap-4">
+              {completedBookings.slice(0, 6).map((booking, index) => (
+                <div key={booking.booking_id} className="dark-card p-4 ac-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(74,222,128,0.12)' }}>
-                        <DollarSign className="h-4 w-4 text-green-400" />
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(74,222,128,0.12)' }}>
+                        <DollarSign className="h-5 w-5 text-green-400" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-white">#{booking.booking_id} — {booking.customer?.first_name} {booking.customer?.last_name}</p>
-                        <p className="text-xs text-gray-500">{booking.booking_date} • {booking.service?.name}</p>
+                        <p className="text-sm font-bold text-white">#{booking.booking_id}</p>
+                        <p className="text-xs text-gray-500">{booking.customer?.first_name} {booking.customer?.last_name}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-green-400">+${booking.total_price}</p>
-                      <p className="text-xs text-gray-600">Paid</p>
+                      <p className="text-lg font-bold text-green-400">+${booking.total_price}</p>
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(74,222,128,0.12)', color: '#4ADE80' }}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-400" /> Paid
+                      </span>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  <div className="pt-3" style={{ borderTop: '1px solid #2D2D2D' }}>
+                    <p className="text-sm text-gray-400">{booking.service?.name}</p>
+                    <p className="text-xs text-gray-600 mt-1">{booking.booking_date}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

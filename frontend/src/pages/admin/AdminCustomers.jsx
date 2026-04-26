@@ -10,7 +10,12 @@ export default function AdminCustomers() {
 
   const handleDelete = async (id, name) => {
     if (window.confirm(`Are you sure you want to delete ${name}? This will also delete all their bookings and vehicles.`)) {
-      await deleteCustomer(id);
+      const success = await deleteCustomer(id);
+      if (success) {
+        alert(`${name} has been deleted successfully.`);
+      } else {
+        alert('Failed to delete customer. Please try again.');
+      }
     }
   };
 
