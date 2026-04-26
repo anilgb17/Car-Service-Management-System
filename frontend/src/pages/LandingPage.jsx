@@ -26,7 +26,10 @@ export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen font-['Inter'] bg-white text-gray-800">
+    <div
+      className="min-h-screen font-['Inter'] bg-white text-gray-800 ac-page-bg"
+      style={{ '--page-bg-image': 'linear-gradient(135deg, #DBEAFE 0%, #F8FAFC 55%, #CFFAFE 100%)' }}
+    >
       {/* Navigation */}
       <nav className="fixed w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -64,30 +67,30 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section id="home" className="pt-32 pb-20 lg:pt-48 lg:pb-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-blue-50/30 overflow-hidden relative">
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-[600px] h-[600px] bg-blue-100/50 rounded-full blur-3xl opacity-50"></div>
+      <section id="home" className="pt-32 pb-20 lg:pt-48 lg:pb-32 px-4 sm:px-6 lg:px-8 bg-[linear-gradient(135deg,#0052CC_0%,#0052CC_50%,#F8FAFC_100%)] overflow-hidden relative">
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-[600px] h-[600px] bg-cyan-200/30 rounded-full blur-3xl opacity-60 ac-float"></div>
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 relative z-10">
           <div className="flex-1 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 font-semibold text-sm mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 text-white font-semibold text-sm mb-6 border border-white/30">
               <Star className="h-4 w-4 fill-current" /> Top Rated Car Service
             </div>
-            <h1 className="text-5xl lg:text-7xl font-extrabold text-gray-900 font-['Outfit'] leading-tight mb-6 tracking-tight">
-              Professional Car Services at Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Convenience</span>
+            <h1 className="text-5xl lg:text-7xl font-extrabold text-white font-['Outfit'] leading-tight mb-6 tracking-tight">
+              Professional Car Services at Your <span className="text-cyan-200">Convenience</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto lg:mx-0">
+            <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto lg:mx-0">
               Book, Track, and Manage All Your Vehicle Maintenance in One Place. Experience hassle-free servicing with our certified experts.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link to="/login" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition shadow-xl shadow-blue-200 flex items-center justify-center gap-2">
                 Book Service Now <ChevronRight className="h-5 w-5" />
               </Link>
-              <a href="#services" className="bg-white hover:bg-gray-50 text-gray-800 px-8 py-4 rounded-xl font-semibold text-lg border border-gray-200 transition flex items-center justify-center">
+              <a href="#services" className="bg-white/95 hover:bg-white text-[#1E293B] px-8 py-4 rounded-xl font-semibold text-lg border border-white/50 transition flex items-center justify-center">
                 Explore Services
               </a>
             </div>
           </div>
           <div className="flex-1 w-full relative">
-            <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-[2rem] transform rotate-3 scale-105 opacity-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#0052CC] to-[#00BCD4] rounded-[2rem] transform rotate-3 scale-105 opacity-20"></div>
             <img 
               src="https://images.unsplash.com/photo-1613214149922-f1809c99b414?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
               alt="Car Service" 
@@ -106,8 +109,8 @@ export default function LandingPage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {SERVICES.map((service, index) => (
-              <div key={index} className="group p-8 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300">
-                <div className="w-16 h-16 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <div key={index} className="group p-8 rounded-xl bg-white border border-[#E2E8F0] shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:-translate-y-2 hover:shadow-[0_12px_24px_rgba(5,82,204,0.15)] hover:border-[#0052CC] transition-all duration-300">
+                <div className="w-16 h-16 rounded-xl bg-blue-50 text-[#0052CC] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   {service.icon}
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 font-['Outfit']">{service.name}</h3>
@@ -116,7 +119,7 @@ export default function LandingPage() {
                   <div className="flex items-center gap-2 text-gray-500 font-medium">
                     <Clock className="h-5 w-5" /> {service.time}
                   </div>
-                  <div className="text-blue-600 font-bold text-xl">
+                  <div className="text-[#0052CC] font-bold text-xl">
                     Starts at {service.price}
                   </div>
                 </div>
@@ -186,7 +189,7 @@ export default function LandingPage() {
             ].map((item, i) => (
               <div key={i} className="relative">
                 {i !== 3 && <div className="hidden md:block absolute top-1/4 right-0 w-full h-[2px] bg-blue-100 -mr-1/2 transform translate-x-1/2 z-0"></div>}
-                <div className="relative z-10 bg-white w-20 h-20 mx-auto rounded-full border-4 border-blue-50 flex items-center justify-center text-2xl font-bold text-blue-600 mb-6 shadow-sm">
+                <div className="relative z-10 w-[60px] h-[60px] mx-auto rounded-full bg-[linear-gradient(135deg,#0052CC_0%,#00BCD4_100%)] flex items-center justify-center text-2xl font-bold text-white mb-6 shadow-[0_8px_16px_rgba(5,82,204,0.2)]">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
@@ -198,7 +201,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="bg-gray-900 text-gray-300 py-16 border-t border-gray-800">
+      <footer id="contact" className="bg-[linear-gradient(135deg,#0F172A_0%,#1E293B_100%)] text-gray-300 pt-16 pb-5 border-t border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div className="col-span-1">

@@ -9,107 +9,81 @@ export default function DashboardHome() {
   const { user } = useAuthStore();
   const { bookings, fetchBookings, isLoading } = useBookingStore();
 
-  useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
+  useEffect(() => { fetchBookings(); }, [fetchBookings]);
 
   const upcomingBookings = bookings.filter(b => b.status === 'Confirmed' || b.status === 'In Progress');
   const completedBookings = bookings.filter(b => b.status === 'Completed');
   const totalSpent = completedBookings.reduce((sum, b) => sum + parseFloat(b.total_price), 0);
 
+  const cards = [
+    { label: 'Upcoming Bookings', value: upcomingBookings.length, icon: CalendarClock, color: '#0A84FF', bg: 'rgba(10,132,255,0.12)' },
+    { label: 'Completed Services', value: completedBookings.length, icon: CheckCircle2, color: '#4ADE80', bg: 'rgba(74,222,128,0.12)' },
+    { label: 'Total Spent', value: `$${totalSpent.toFixed(2)}`, icon: DollarSign, color: '#A78BFA', bg: 'rgba(167,139,250,0.12)' },
+    { label: 'Loyalty Points', value: user?.loyalty_points || 0, icon: Star, color: '#FF6B00', bg: 'rgba(255,107,0,0.12)' },
+  ];
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 font-['Outfit']">Welcome back, {user?.first_name}</h1>
-          <p className="text-gray-600 mt-1">Here is an overview of your account.</p>
+          <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Welcome back, {user?.first_name} 👋
+          </h1>
+          <p className="text-gray-400 mt-1">Here is an overview of your account.</p>
         </div>
-        <Link 
-          to="/dashboard/book-service"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium shadow-lg shadow-blue-200 transition flex items-center gap-2"
-        >
-          <Plus className="h-5 w-5" /> Book New Service
+        <Link to="/dashboard/book-service" className="btn-primary flex items-center gap-2 px-5 py-2.5">
+          <Plus className="h-4 w-4" /> Book Service
         </Link>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
-            <CalendarClock className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 font-medium">Upcoming Bookings</p>
-            <p className="text-2xl font-bold text-gray-900">{upcomingBookings.length}</p>
-          </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
-            <CheckCircle2 className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 font-medium">Completed Services</p>
-            <p className="text-2xl font-bold text-gray-900">{completedBookings.length}</p>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
-            <DollarSign className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 font-medium">Total Spent</p>
-            <p className="text-2xl font-bold text-gray-900">${totalSpent.toFixed(2)}</p>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-yellow-50 text-yellow-600 flex items-center justify-center">
-            <Star className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 font-medium">Loyalty Points</p>
-            <p className="text-2xl font-bold text-gray-900">{user?.loyalty_points || 0}</p>
-          </div>
-        </div>
+      {/* KPI Cards */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        {cards.map((card, i) => {
+          const Icon = card.icon;
+          return (
+            <div key={i} className="dark-card p-5 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: card.bg }}>
+                <Icon className="h-6 w-6" style={{ color: card.color }} />
+              </div>
+              <div>
+                <p className="text-sm text-gray-400">{card.label}</p>
+                <p className="text-2xl font-bold text-white">{card.value}</p>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Recent Bookings */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-900 font-['Outfit']">Recent Bookings</h2>
-          <Link to="/dashboard/bookings" className="text-blue-600 text-sm font-medium hover:underline flex items-center">
+      <div className="dark-card overflow-hidden">
+        <div className="p-5 flex justify-between items-center" style={{ borderBottom: '1px solid #2D2D2D' }}>
+          <h2 className="text-lg font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Recent Bookings</h2>
+          <Link to="/dashboard/bookings" className="text-[#0A84FF] text-sm font-medium hover:text-blue-300 flex items-center gap-1 transition">
             View All <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
-        
+
         {isLoading ? (
-          <div className="p-6 text-center text-gray-500">Loading...</div>
+          <div className="p-8 text-center text-gray-500">Loading...</div>
         ) : bookings.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500 mb-4">You have no recent bookings.</p>
-          </div>
+          <div className="p-8 text-center text-gray-500">No recent bookings.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left">
               <thead>
-                <tr className="bg-gray-50 text-gray-500 text-sm">
-                  <th className="px-6 py-4 font-medium">Service</th>
-                  <th className="px-6 py-4 font-medium">Vehicle</th>
-                  <th className="px-6 py-4 font-medium">Date & Time</th>
-                  <th className="px-6 py-4 font-medium">Status</th>
+                <tr style={{ borderBottom: '1px solid #2D2D2D' }}>
+                  {['Service', 'Vehicle', 'Date & Time', 'Status'].map(h => (
+                    <th key={h} className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
-                {bookings.slice(0, 3).map((booking) => (
-                  <tr key={booking.booking_id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 font-medium text-gray-900">{booking.service?.name}</td>
-                    <td className="px-6 py-4 text-gray-600">{booking.vehicle?.make} {booking.vehicle?.model}</td>
-                    <td className="px-6 py-4 text-gray-600">{booking.booking_date} <span className="text-gray-400 text-sm">{booking.booking_time}</span></td>
-                    <td className="px-6 py-4">
-                      <BookingProgress status={booking.status} />
-                    </td>
+              <tbody>
+                {bookings.slice(0, 5).map((booking) => (
+                  <tr key={booking.booking_id} className="hover:bg-white/3 transition" style={{ borderBottom: '1px solid #1E1E1E' }}>
+                    <td className="px-5 py-4 font-medium text-white">{booking.service?.name}</td>
+                    <td className="px-5 py-4 text-gray-400">{booking.vehicle?.make} {booking.vehicle?.model}</td>
+                    <td className="px-5 py-4 text-gray-400">{booking.booking_date} <span className="text-gray-600 text-xs">{booking.booking_time}</span></td>
+                    <td className="px-5 py-4"><BookingProgress status={booking.status} /></td>
                   </tr>
                 ))}
               </tbody>

@@ -1,149 +1,129 @@
 import { useEffect, useState } from 'react';
 import useAdminStore from '../../store/adminStore';
-import { UsersRound, Plus, Trash2, X } from 'lucide-react';
+import { UsersRound, Plus, Trash2, X, Mail, Phone } from 'lucide-react';
 
 export default function AdminStaff() {
   const { allStaff, fetchAllStaff, createStaff, deleteStaff, isLoading } = useAdminStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    first_name: '', last_name: '', email: '', phone: '', role: 'Mechanic'
-  });
+  const [formData, setFormData] = useState({ first_name: '', last_name: '', email: '', phone: '', role: 'Mechanic' });
 
-  useEffect(() => {
-    fetchAllStaff();
-  }, [fetchAllStaff]);
+  useEffect(() => { fetchAllStaff(); }, [fetchAllStaff]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const success = await createStaff(formData);
-    if (success) {
-      setIsModalOpen(false);
-      setFormData({ first_name: '', last_name: '', email: '', phone: '', role: 'Mechanic' });
-    }
+    if (success) { setIsModalOpen(false); setFormData({ first_name: '', last_name: '', email: '', phone: '', role: 'Mechanic' }); }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to remove this staff member?')) {
-      await deleteStaff(id);
-    }
+    if (window.confirm('Remove this staff member?')) await deleteStaff(id);
   };
+
+  const ROLE_COLORS = { Manager: '#A78BFA', 'Service Advisor': '#0A84FF', Mechanic: '#4ADE80' };
+  const inputStyle = { background: '#2A2A2A', border: '1.5px solid #374151', color: '#E5E7EB', borderRadius: '8px', padding: '10px 14px', outline: 'none', width: '100%' };
 
   return (
     <div>
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 font-['Outfit']">Staff Management</h1>
-          <p className="text-gray-600 mt-1">Manage service center employees and roles.</p>
+          <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Staff Management</h1>
+          <p className="text-gray-400 mt-1">Manage service center employees and roles.</p>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-lg shadow-blue-200 transition flex items-center gap-2"
-        >
-          <Plus className="h-5 w-5" /> Add Staff Member
+        <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center gap-2 px-5 py-2.5">
+          <Plus className="h-4 w-4" /> Add Staff
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        {isLoading && allStaff.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">Loading staff...</div>
-        ) : allStaff.length === 0 ? (
-          <div className="p-12 text-center">
-            <UsersRound className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">No staff members found.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider">Employee</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider">Contact</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {allStaff.map((staff) => (
-                  <tr key={staff.user_id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
-                          {staff.first_name[0]}{staff.last_name[0]}
-                        </div>
-                        <div className="font-bold text-gray-900">{staff.first_name} {staff.last_name}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 font-medium">{staff.email}</div>
-                      <div className="text-sm text-gray-500">{staff.phone}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
-                        staff.role === 'Manager' ? 'bg-purple-100 text-purple-800' :
-                        staff.role === 'Service Advisor' ? 'bg-blue-100 text-blue-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
+      {isLoading && allStaff.length === 0 ? (
+        <div className="text-center py-10 text-gray-500">Loading staff...</div>
+      ) : allStaff.length === 0 ? (
+        <div className="dark-card p-12 text-center">
+          <UsersRound className="h-12 w-12 text-gray-700 mx-auto mb-4" />
+          <p className="text-gray-500">No staff members found.</p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {allStaff.map((staff) => {
+            const roleColor = ROLE_COLORS[staff.role] || '#6B7280';
+            return (
+              <div key={staff.user_id} className="dark-card p-5">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg" style={{ background: `${roleColor}22`, border: `2px solid ${roleColor}44`, color: roleColor }}>
+                      {staff.first_name[0]}{staff.last_name[0]}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-white">{staff.first_name} {staff.last_name}</h3>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold mt-0.5" style={{ background: `${roleColor}18`, color: roleColor, border: `1px solid ${roleColor}33` }}>
                         {staff.role}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button 
-                        onClick={() => handleDelete(staff.user_id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                        title="Remove"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                    </div>
+                  </div>
+                  <button onClick={() => handleDelete(staff.user_id)} className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/10 transition">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <Mail className="h-3.5 w-3.5 text-gray-600" /> {staff.email}
+                  </div>
+                  {staff.phone && (
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <Phone className="h-3.5 w-3.5 text-gray-600" /> {staff.phone}
+                    </div>
+                  )}
+                </div>
+                <div className="mt-4 pt-3 flex items-center justify-between" style={{ borderTop: '1px solid #2D2D2D' }}>
+                  <span className="text-xs text-gray-600">Status</span>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-400" /> Active
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
-      {/* Add Staff Modal */}
+      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-900/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900 font-['Outfit']">Add Staff Member</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition">
-                <X className="h-6 w-6" />
-              </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
+          <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style={{ background: '#1E1E1E', border: '1px solid #2D2D2D' }}>
+            <div className="flex justify-between items-center px-6 py-4" style={{ borderBottom: '1px solid #2D2D2D' }}>
+              <h2 className="text-lg font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Add Staff Member</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white transition"><X className="h-5 w-5" /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                  <input required type="text" className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" value={formData.first_name} onChange={e => setFormData({...formData, first_name: e.target.value})} />
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">First Name</label>
+                  <input required type="text" style={inputStyle} value={formData.first_name} onChange={e => setFormData({...formData, first_name: e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                  <input required type="text" className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" value={formData.last_name} onChange={e => setFormData({...formData, last_name: e.target.value})} />
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">Last Name</label>
+                  <input required type="text" style={inputStyle} value={formData.last_name} onChange={e => setFormData({...formData, last_name: e.target.value})} />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input required type="email" className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">Email</label>
+                <input required type="email" style={inputStyle} value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                <input required type="tel" className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">Phone</label>
+                <input required type="tel" style={inputStyle} value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                <select required className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}>
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">Role</label>
+                <select required style={inputStyle} value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}>
                   <option value="Mechanic">Mechanic</option>
                   <option value="Service Advisor">Service Advisor</option>
                   <option value="Manager">Manager</option>
                 </select>
               </div>
-              <p className="text-xs text-gray-500 pt-2">* Default password will be "password123"</p>
-              <div className="pt-4 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 text-gray-600 hover:bg-gray-100 rounded-xl transition">Cancel</button>
-                <button type="submit" disabled={isLoading} className="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition disabled:opacity-70 shadow-lg shadow-blue-200">
+              <p className="text-xs text-gray-600">Default password: "password123"</p>
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">Cancel</button>
+                <button type="submit" disabled={isLoading} className="btn-primary px-5 py-2 text-sm">
                   {isLoading ? 'Saving...' : 'Add Staff'}
                 </button>
               </div>

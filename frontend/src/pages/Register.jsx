@@ -1,182 +1,102 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
-import { UserPlus, Mail, Lock, User, Phone } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Phone, Car } from 'lucide-react';
 
 export default function Register() {
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: ''
+    first_name: '', last_name: '', email: '', phone: '', password: '', confirmPassword: ''
   });
   const [passwordError, setPasswordError] = useState('');
-  
   const { register, error, isLoading, clearError } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
     setPasswordError('');
-
     if (formData.password !== formData.confirmPassword) {
       setPasswordError('Passwords do not match');
       return;
     }
-
     const { confirmPassword, ...submitData } = formData;
     const success = await register(submitData);
-    if (success) {
-      navigate('/login');
-    }
+    if (success) navigate('/login');
+  };
+
+  const inputStyle = {
+    background: 'rgba(0,0,0,0.35)',
+    border: '1.5px solid rgba(255,255,255,0.1)',
+    color: '#E5E7EB'
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 font-['Outfit']">
-            Create an Account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Already have an account?{' '}
-            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              Sign in instead
-            </Link>
-          </p>
+    <div
+      className="min-h-screen flex items-center justify-center relative overflow-hidden py-8 px-4"
+      style={{
+        background: 'linear-gradient(rgba(0,0,0,0.68), rgba(0,0,0,0.78)), url(https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80) center/cover no-repeat'
+      }}
+    >
+      <div className="absolute inset-0" style={{ backdropFilter: 'blur(3px)' }} />
+      <div className="relative z-10 w-full max-w-md ac-enter">
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <div className="w-11 h-11 bg-[#0A84FF] rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <Car className="text-white h-6 w-6" />
+          </div>
+          <span className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>AutoCare</span>
         </div>
-        
-        {(error || passwordError) && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
-            <p className="text-sm text-red-700">{error || passwordError}</p>
-          </div>
-        )}
 
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
+        <div className="rounded-2xl p-8" style={{ background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(14px)', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
+          <h2 className="text-2xl font-bold text-white mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>Create Account</h2>
+          <p className="text-gray-400 text-sm mb-6">
+            Already have an account?{' '}
+            <Link to="/login" className="text-[#0A84FF] hover:text-blue-300 font-medium">Sign in</Link>
+          </p>
+
+          {(error || passwordError) && (
+            <div className="mb-4 p-3 rounded-lg text-sm text-red-300" style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)' }}>
+              {error || passwordError}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <input name="first_name" type="text" required placeholder="First Name" value={formData.first_name} onChange={handleChange} className="dark-input pl-9" style={inputStyle} />
               </div>
-              <input
-                name="first_name"
-                type="text"
-                required
-                className="appearance-none rounded-lg relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="First Name"
-                value={formData.first_name}
-                onChange={handleChange}
-              />
+              <div>
+                <input name="last_name" type="text" required placeholder="Last Name" value={formData.last_name} onChange={handleChange} className="dark-input" style={inputStyle} />
+              </div>
             </div>
             <div className="relative">
-              <input
-                name="last_name"
-                type="text"
-                required
-                className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Last Name"
-                value={formData.last_name}
-                onChange={handleChange}
-              />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <input name="email" type="email" required placeholder="Email address" value={formData.email} onChange={handleChange} className="dark-input pl-9" style={inputStyle} />
             </div>
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail className="h-5 w-5 text-gray-400" />
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <input name="phone" type="tel" placeholder="Phone (Optional)" value={formData.phone} onChange={handleChange} className="dark-input pl-9" style={inputStyle} />
             </div>
-            <input
-              name="email"
-              type="email"
-              required
-              className="appearance-none rounded-lg relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Email address"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Phone className="h-5 w-5 text-gray-400" />
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <input name="password" type="password" required placeholder="Password" value={formData.password} onChange={handleChange} className="dark-input pl-9" style={inputStyle} />
             </div>
-            <input
-              name="phone"
-              type="tel"
-              className="appearance-none rounded-lg relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Phone Number (Optional)"
-              value={formData.phone}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-gray-400" />
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <input name="confirmPassword" type="password" required placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} className="dark-input pl-9" style={inputStyle} />
             </div>
-            <input
-              name="password"
-              type="password"
-              required
-              className="appearance-none rounded-lg relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              name="confirmPassword"
-              type="password"
-              required
-              className="appearance-none rounded-lg relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="flex items-center">
-            <input
-              id="terms"
-              name="terms"
-              type="checkbox"
-              required
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-              I agree to the <a href="#" className="text-blue-600 hover:underline">Terms & Conditions</a>
+            <label className="flex items-center gap-2 text-gray-400 text-sm cursor-pointer">
+              <input type="checkbox" required className="rounded" />
+              I agree to the <a href="#" className="text-[#0A84FF] hover:underline">Terms and Conditions</a>
             </label>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:opacity-70"
-            >
-              {isLoading ? 'Creating account...' : (
-                <>
-                  <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                    <UserPlus className="h-5 w-5 text-green-500 group-hover:text-green-400" aria-hidden="true" />
-                  </span>
-                  Sign Up
-                </>
-              )}
+            <button type="submit" disabled={isLoading} className="btn-primary w-full flex items-center justify-center gap-2 py-3">
+              <UserPlus className="h-4 w-4" />
+              {isLoading ? 'Creating account...' : 'Create Account'}
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -2,134 +2,131 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useBookingStore from '../store/bookingStore';
 import useVehicleStore from '../store/vehicleStore';
-import { Settings, Car, Calendar, CreditCard, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Settings, Car, Calendar, CreditCard, ChevronRight, CheckCircle2, Wrench, Droplets, Zap, Shield } from 'lucide-react';
+
+const SERVICE_ICONS = { 'Oil': Droplets, 'Tire': Car, 'Battery': Zap, 'Engine': Settings, 'Brake': Shield, 'default': Wrench };
+const getIcon = (name) => {
+  const key = Object.keys(SERVICE_ICONS).find(k => name?.includes(k)) || 'default';
+  return SERVICE_ICONS[key];
+};
 
 export default function BookService() {
   const [step, setStep] = useState(1);
   const { services, fetchServices, createBooking, isLoading: bookingLoading } = useBookingStore();
-  const { vehicles, fetchVehicles, isLoading: vehicleLoading } = useVehicleStore();
+  const { vehicles, fetchVehicles } = useVehicleStore();
   const navigate = useNavigate();
 
-  const [bookingData, setBookingData] = useState({
-    service_ids: [],
-    vehicle_id: null,
-    booking_date: '',
-    booking_time: '',
-    notes: '',
-    total_price: 0
-  });
+  const [bookingData, setBookingData] = useState({ service_ids: [], vehicle_id: null, booking_date: '', booking_time: '', notes: '', total_price: 0 });
 
-  useEffect(() => {
-    fetchServices();
-    fetchVehicles();
-  }, [fetchServices, fetchVehicles]);
+  useEffect(() => { fetchServices(); fetchVehicles(); }, [fetchServices, fetchVehicles]);
 
-  const handleNext = () => setStep(step + 1);
-  const handleBack = () => setStep(step - 1);
+  const handleNext = () => setStep(s => s + 1);
+  const handleBack = () => setStep(s => s - 1);
 
-  const toggleServiceSelect = (service) => {
+  const toggleService = (service) => {
     const isSelected = bookingData.service_ids.includes(service.service_id);
-    let newServiceIds;
-    let newTotalPrice;
-
-    if (isSelected) {
-      newServiceIds = bookingData.service_ids.filter(id => id !== service.service_id);
-      newTotalPrice = bookingData.total_price - parseFloat(service.base_price);
-    } else {
-      newServiceIds = [...bookingData.service_ids, service.service_id];
-      newTotalPrice = bookingData.total_price + parseFloat(service.base_price);
-    }
-
-    setBookingData({ 
-      ...bookingData, 
-      service_ids: newServiceIds, 
-      total_price: parseFloat(newTotalPrice.toFixed(2)) 
-    });
-  };
-
-  const handleVehicleSelect = (vehicleId) => {
-    setBookingData({ ...bookingData, vehicle_id: vehicleId });
-    handleNext();
-  };
-
-  const handleDateTimeSubmit = (e) => {
-    e.preventDefault();
-    handleNext();
+    setBookingData(prev => ({
+      ...prev,
+      service_ids: isSelected ? prev.service_ids.filter(id => id !== service.service_id) : [...prev.service_ids, service.service_id],
+      total_price: parseFloat((isSelected ? prev.total_price - parseFloat(service.base_price) : prev.total_price + parseFloat(service.base_price)).toFixed(2))
+    }));
   };
 
   const handlePayment = async () => {
-    // Submit using service_ids array
     const success = await createBooking(bookingData);
-    if (success) {
-      setStep(5);
-      setTimeout(() => navigate('/dashboard/bookings'), 3000);
-    }
+    if (success) { setStep(5); setTimeout(() => navigate('/dashboard/bookings'), 3000); }
   };
 
   const selectedServices = services.filter(s => bookingData.service_ids.includes(s.service_id));
   const selectedVehicle = vehicles.find(v => v.vehicle_id === bookingData.vehicle_id);
 
+  const steps = [
+    { num: 1, icon: Settings, label: 'Service' },
+    { num: 2, icon: Car, label: 'Vehicle' },
+    { num: 3, icon: Calendar, label: 'Schedule' },
+    { num: 4, icon: CreditCard, label: 'Payment' },
+  ];
+
+  const inputStyle = { background: '#2A2A2A', border: '1.5px solid #374151', color: '#E5E7EB', borderRadius: '8px', padding: '10px 14px', outline: 'none', width: '100%' };
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 font-['Outfit']">Book a Service</h1>
-        <p className="text-gray-600 mt-1">Schedule your next maintenance or repair.</p>
+        <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Book a Service</h1>
+        <p className="text-gray-400 mt-1">Schedule your next maintenance or repair.</p>
       </div>
 
       {/* Stepper */}
-      <div className="mb-8 flex justify-between items-center relative">
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 -z-10"></div>
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-blue-600 -z-10 transition-all duration-500" style={{ width: `${((step - 1) / 3) * 100}%` }}></div>
-        
-        {[
-          { num: 1, icon: Settings, label: 'Service' },
-          { num: 2, icon: Car, label: 'Vehicle' },
-          { num: 3, icon: Calendar, label: 'Schedule' },
-          { num: 4, icon: CreditCard, label: 'Payment' }
-        ].map((s) => (
-          <div key={s.num} className="flex flex-col items-center">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg mb-2 transition-colors duration-300 ${step >= s.num ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-gray-200 text-gray-500'}`}>
-              <s.icon className="h-6 w-6" />
-            </div>
-            <span className={`text-sm font-medium ${step >= s.num ? 'text-gray-900' : 'text-gray-500'}`}>{s.label}</span>
-          </div>
-        ))}
-      </div>
+      {step < 5 && (
+        <div className="mb-8 flex justify-between items-center relative">
+          <div className="absolute left-0 top-6 w-full h-0.5" style={{ background: '#2D2D2D', zIndex: 0 }} />
+          <div className="absolute left-0 top-6 h-0.5 transition-all duration-500" style={{ width: `${((step - 1) / 3) * 100}%`, background: 'linear-gradient(90deg, #0A84FF, #0066CC)', zIndex: 1 }} />
+          {steps.map((s) => {
+            const Icon = s.icon;
+            const done = step > s.num;
+            const active = step === s.num;
+            return (
+              <div key={s.num} className="flex flex-col items-center relative z-10">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
+                  done ? 'bg-green-500 shadow-lg shadow-green-500/30' :
+                  active ? 'bg-[#0A84FF] shadow-lg shadow-blue-500/30' :
+                  'bg-[#2D2D2D]'
+                }`}>
+                  {done ? <CheckCircle2 className="h-5 w-5 text-white" /> : <Icon className={`h-5 w-5 ${active ? 'text-white' : 'text-gray-500'}`} />}
+                </div>
+                <span className={`text-xs font-medium ${active ? 'text-white' : done ? 'text-green-400' : 'text-gray-600'}`}>{s.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+      <div className="dark-card p-6 sm:p-8">
         {/* Step 1: Services */}
         {step === 1 && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold font-['Outfit']">Select Services</h2>
-              <span className="text-gray-500 text-sm font-medium">{bookingData.service_ids.length} selected</span>
+              <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Select Services</h2>
+              <span className="text-sm text-gray-400">{bookingData.service_ids.length} selected</span>
             </div>
-            <div className="grid sm:grid-cols-2 gap-4 mb-6">
+            <div className="grid sm:grid-cols-2 gap-3 mb-6">
               {services.map(service => {
                 const isSelected = bookingData.service_ids.includes(service.service_id);
+                const Icon = getIcon(service.name);
                 return (
-                  <div 
-                    key={service.service_id} 
-                    onClick={() => toggleServiceSelect(service)}
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${isSelected ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-blue-200'}`}
+                  <div key={service.service_id} onClick={() => toggleService(service)}
+                    className="p-4 rounded-xl cursor-pointer transition-all"
+                    style={{
+                      background: isSelected ? 'rgba(10,132,255,0.12)' : '#2A2A2A',
+                      border: `2px solid ${isSelected ? '#0A84FF' : '#374151'}`,
+                    }}
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-bold text-gray-900">{service.name}</h3>
-                      <span className="text-blue-600 font-bold">${service.base_price}</span>
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: isSelected ? 'rgba(10,132,255,0.2)' : '#1E1E1E' }}>
+                        <Icon className={`h-5 w-5 ${isSelected ? 'text-[#0A84FF]' : 'text-gray-500'}`} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-bold text-white text-sm">{service.name}</h3>
+                          <span className="text-[#0A84FF] font-bold text-sm">${service.base_price}</span>
+                        </div>
+                        <p className="text-gray-500 text-xs mt-1">{service.description}</p>
+                      </div>
                     </div>
-                    <p className="text-gray-500 text-sm">{service.description}</p>
                   </div>
                 );
               })}
-              {services.length === 0 && <p className="text-gray-500 col-span-2">No services available currently.</p>}
+              {services.length === 0 && <p className="text-gray-500 col-span-2 text-center py-8">No services available.</p>}
             </div>
+            {bookingData.service_ids.length > 0 && (
+              <div className="flex justify-between items-center mb-4 p-3 rounded-lg" style={{ background: 'rgba(10,132,255,0.08)', border: '1px solid rgba(10,132,255,0.2)' }}>
+                <span className="text-sm text-gray-300">{bookingData.service_ids.length} service(s) selected</span>
+                <span className="font-bold text-[#0A84FF]">Total: ${bookingData.total_price}</span>
+              </div>
+            )}
             <div className="flex justify-end">
-              <button 
-                onClick={handleNext} 
-                disabled={bookingData.service_ids.length === 0}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Continue
+              <button onClick={handleNext} disabled={bookingData.service_ids.length === 0} className="btn-primary flex items-center gap-2 px-6 py-2.5">
+                Continue <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -138,121 +135,110 @@ export default function BookService() {
         {/* Step 2: Vehicles */}
         {step === 2 && (
           <div>
-            <h2 className="text-xl font-bold mb-6 font-['Outfit']">Select Your Vehicle</h2>
+            <h2 className="text-xl font-bold text-white mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>Select Your Vehicle</h2>
             {vehicles.length === 0 ? (
               <div className="text-center py-8">
-                <p className="mb-4">You don't have any vehicles registered.</p>
-                <button onClick={() => navigate('/dashboard/vehicles')} className="text-blue-600 font-medium hover:underline">Add a vehicle first</button>
+                <p className="text-gray-400 mb-4">No vehicles registered.</p>
+                <button onClick={() => navigate('/dashboard/vehicles')} className="text-[#0A84FF] font-medium hover:underline">Add a vehicle first</button>
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 gap-4 mb-6">
-                {vehicles.map(vehicle => (
-                  <div 
-                    key={vehicle.vehicle_id}
-                    onClick={() => handleVehicleSelect(vehicle.vehicle_id)}
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${bookingData.vehicle_id === vehicle.vehicle_id ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-blue-200'}`}
-                  >
-                    <h3 className="font-bold text-gray-900">{vehicle.make} {vehicle.model}</h3>
-                    <p className="text-gray-500 text-sm">{vehicle.year} • {vehicle.registration_number}</p>
-                  </div>
-                ))}
+              <div className="grid sm:grid-cols-2 gap-3 mb-6">
+                {vehicles.map(vehicle => {
+                  const isSelected = bookingData.vehicle_id === vehicle.vehicle_id;
+                  return (
+                    <div key={vehicle.vehicle_id} onClick={() => { setBookingData(p => ({...p, vehicle_id: vehicle.vehicle_id})); handleNext(); }}
+                      className="p-4 rounded-xl cursor-pointer transition-all"
+                      style={{ background: isSelected ? 'rgba(10,132,255,0.12)' : '#2A2A2A', border: `2px solid ${isSelected ? '#0A84FF' : '#374151'}` }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: '#1E1E1E' }}>
+                          <Car className="h-5 w-5 text-[#0A84FF]" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-white">{vehicle.make} {vehicle.model}</h3>
+                          <p className="text-gray-500 text-xs">{vehicle.year} • {vehicle.registration_number}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
-            <button onClick={handleBack} className="text-gray-500 hover:text-gray-700 font-medium">Back</button>
+            <button onClick={handleBack} className="text-gray-500 hover:text-gray-300 text-sm font-medium transition">← Back</button>
           </div>
         )}
 
-        {/* Step 3: Date & Time */}
+        {/* Step 3: Schedule */}
         {step === 3 && (
           <div>
-            <h2 className="text-xl font-bold mb-6 font-['Outfit']">Select Date & Time</h2>
-            <form onSubmit={handleDateTimeSubmit} className="space-y-6">
-              <div className="grid sm:grid-cols-2 gap-6">
+            <h2 className="text-xl font-bold text-white mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>Select Date & Time</h2>
+            <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="space-y-5">
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Date</label>
-                  <input 
-                    type="date" 
-                    required 
-                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                    className="w-full rounded-lg border-gray-300 border px-3 py-2 cursor-pointer"
-                    value={bookingData.booking_date}
-                    onChange={e => setBookingData({...bookingData, booking_date: e.target.value})}
-                    min={new Date().toISOString().split('T')[0]}
-                  />
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">Preferred Date</label>
+                  <input type="date" required style={inputStyle} value={bookingData.booking_date}
+                    onChange={e => setBookingData(p => ({...p, booking_date: e.target.value}))}
+                    min={new Date().toISOString().split('T')[0]} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Time</label>
-                  <input 
-                    type="time" 
-                    required 
-                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                    className="w-full rounded-lg border-gray-300 border px-3 py-2 cursor-pointer"
-                    value={bookingData.booking_time}
-                    onChange={e => setBookingData({...bookingData, booking_time: e.target.value})}
-                  />
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">Preferred Time</label>
+                  <input type="time" required style={inputStyle} value={bookingData.booking_time}
+                    onChange={e => setBookingData(p => ({...p, booking_time: e.target.value}))} />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Additional Notes (Optional)</label>
-                <textarea 
-                  rows={3}
-                  className="w-full rounded-lg border-gray-300 border px-3 py-2"
-                  value={bookingData.notes}
-                  onChange={e => setBookingData({...bookingData, notes: e.target.value})}
-                  placeholder="Any specific issues or requests?"
-                ></textarea>
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">Additional Notes (Optional)</label>
+                <textarea rows={3} style={{...inputStyle, resize: 'none'}} value={bookingData.notes}
+                  onChange={e => setBookingData(p => ({...p, notes: e.target.value}))}
+                  placeholder="Any specific issues or requests?" />
               </div>
-              <div className="flex justify-between items-center pt-4">
-                <button type="button" onClick={handleBack} className="text-gray-500 hover:text-gray-700 font-medium">Back</button>
-                <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">Continue to Payment</button>
+              <div className="flex justify-between items-center pt-2">
+                <button type="button" onClick={handleBack} className="text-gray-500 hover:text-gray-300 text-sm font-medium transition">← Back</button>
+                <button type="submit" className="btn-primary flex items-center gap-2 px-6 py-2.5">
+                  Continue <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
             </form>
           </div>
         )}
 
-        {/* Step 4: Payment / Confirm */}
+        {/* Step 4: Payment */}
         {step === 4 && (
           <div>
-            <h2 className="text-xl font-bold mb-6 font-['Outfit']">Review & Pay</h2>
-            <div className="bg-gray-50 rounded-xl p-6 mb-6">
-              <h3 className="font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">Order Summary</h3>
-              <div className="space-y-3 mb-6">
-                <div className="flex flex-col text-gray-600 mb-3">
-                  <span className="font-medium mb-1">Services Selected:</span>
-                  <ul className="list-disc list-inside ml-2">
-                    {selectedServices.map(s => (
-                      <li key={s.service_id} className="text-gray-900">{s.name} <span className="text-gray-500 text-sm">(${s.base_price})</span></li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Vehicle</span>
-                  <span className="font-medium text-gray-900">{selectedVehicle?.make} {selectedVehicle?.model}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Date & Time</span>
-                  <span className="font-medium text-gray-900">{bookingData.booking_date} at {bookingData.booking_time}</span>
-                </div>
-                {bookingData.notes && (
-                  <div className="text-gray-600 text-sm mt-2 border-t border-gray-200 pt-2">
-                    <span className="font-medium">Notes:</span> {bookingData.notes}
+            <h2 className="text-xl font-bold text-white mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>Review & Confirm</h2>
+            <div className="rounded-xl p-5 mb-6 space-y-3" style={{ background: '#2A2A2A', border: '1px solid #374151' }}>
+              <h3 className="font-bold text-white pb-2" style={{ borderBottom: '1px solid #374151' }}>Order Summary</h3>
+              <div>
+                <p className="text-xs text-gray-500 mb-2">Services</p>
+                {selectedServices.map(s => (
+                  <div key={s.service_id} className="flex justify-between text-sm py-1">
+                    <span className="text-gray-300">{s.name}</span>
+                    <span className="text-white font-medium">${s.base_price}</span>
                   </div>
-                )}
+                ))}
               </div>
-              <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-                <span className="text-lg font-bold text-gray-900">Total Amount</span>
-                <span className="text-2xl font-bold text-blue-600">${bookingData.total_price}</span>
+              <div className="flex justify-between text-sm pt-2" style={{ borderTop: '1px solid #374151' }}>
+                <span className="text-gray-400">Vehicle</span>
+                <span className="text-white">{selectedVehicle?.make} {selectedVehicle?.model}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Date & Time</span>
+                <span className="text-white">{bookingData.booking_date} at {bookingData.booking_time}</span>
+              </div>
+              {bookingData.notes && (
+                <div className="text-sm pt-2" style={{ borderTop: '1px solid #374151' }}>
+                  <span className="text-gray-400">Notes: </span><span className="text-gray-300">{bookingData.notes}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center pt-3" style={{ borderTop: '1px solid #374151' }}>
+                <span className="font-bold text-white">Total</span>
+                <span className="text-2xl font-bold text-[#0A84FF]">${bookingData.total_price}</span>
               </div>
             </div>
-
             <div className="flex justify-between items-center">
-              <button onClick={handleBack} className="text-gray-500 hover:text-gray-700 font-medium">Back</button>
-              <button 
-                onClick={handlePayment} 
-                disabled={bookingLoading}
-                className="bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700 transition flex items-center gap-2 shadow-lg shadow-green-200 disabled:opacity-70"
-              >
-                {bookingLoading ? 'Processing...' : `Pay $${bookingData.total_price} Securely`}
+              <button onClick={handleBack} className="text-gray-500 hover:text-gray-300 text-sm font-medium transition">← Back</button>
+              <button onClick={handlePayment} disabled={bookingLoading} className="btn-accent flex items-center gap-2 px-8 py-3 text-base font-bold">
+                {bookingLoading ? 'Processing...' : `Confirm & Pay $${bookingData.total_price}`}
                 <ChevronRight className="h-5 w-5" />
               </button>
             </div>
@@ -262,12 +248,12 @@ export default function BookService() {
         {/* Step 5: Success */}
         {step === 5 && (
           <div className="text-center py-12">
-            <div className="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="h-10 w-10" />
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'rgba(74,222,128,0.15)' }}>
+              <CheckCircle2 className="h-10 w-10 text-green-400" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4 font-['Outfit']">Booking Confirmed!</h2>
-            <p className="text-gray-600 mb-8">Your service appointments have been scheduled successfully. We look forward to seeing you.</p>
-            <p className="text-sm text-gray-500">Redirecting to your bookings...</p>
+            <h2 className="text-3xl font-bold text-white mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>Booking Confirmed!</h2>
+            <p className="text-gray-400 mb-4">Your service has been scheduled successfully.</p>
+            <p className="text-sm text-gray-600">Redirecting to your bookings...</p>
           </div>
         )}
       </div>

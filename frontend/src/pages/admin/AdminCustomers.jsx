@@ -6,86 +6,81 @@ export default function AdminCustomers() {
   const { allCustomers, fetchAllCustomers, isLoading } = useAdminStore();
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    fetchAllCustomers();
-  }, [fetchAllCustomers]);
+  useEffect(() => { fetchAllCustomers(); }, [fetchAllCustomers]);
 
-  const filteredCustomers = allCustomers.filter(c => 
+  const filteredCustomers = allCustomers.filter(c =>
     c.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const thCls = "px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left";
+  const tdCls = "px-5 py-4";
+
   return (
     <div>
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 font-['Outfit']">Customer Directory</h1>
-          <p className="text-gray-600 mt-1">View and manage registered customers.</p>
+          <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Customer Directory</h1>
+          <p className="text-gray-400 mt-1">View and manage registered customers.</p>
         </div>
-        
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input 
-            type="text"
-            placeholder="Search by name or email"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full md:w-80 bg-white"
-          />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <input type="text" placeholder="Search by name or email..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+            className="pl-9 pr-4 py-2.5 text-sm rounded-lg outline-none w-full md:w-72"
+            style={{ background: '#2A2A2A', border: '1.5px solid #374151', color: '#E5E7EB' }} />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="dark-card overflow-hidden">
         {isLoading ? (
           <div className="p-12 text-center text-gray-500">Loading customers...</div>
         ) : filteredCustomers.length === 0 ? (
           <div className="p-12 text-center">
-            <UsersRound className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">No customers found.</p>
+            <UsersRound className="h-12 w-12 text-gray-700 mx-auto mb-4" />
+            <p className="text-gray-500">No customers found.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider">Contact Info</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider">Location</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider text-center">Total Bookings</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider text-center">Status</th>
+            <table className="w-full text-left">
+              <thead style={{ borderBottom: '1px solid #2D2D2D' }}>
+                <tr>
+                  <th className={thCls}>Customer</th>
+                  <th className={thCls}>Contact</th>
+                  <th className={thCls}>Location</th>
+                  <th className={`${thCls} text-center`}>Bookings</th>
+                  <th className={`${thCls} text-center`}>Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody>
                 {filteredCustomers.map((customer) => (
-                  <tr key={customer.user_id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                  <tr key={customer.user_id} className="hover:bg-white/2 transition" style={{ borderBottom: '1px solid #1E1E1E' }}>
+                    <td className={tdCls}>
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold shadow-inner">
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ background: 'linear-gradient(135deg, #0A84FF, #0066CC)' }}>
                           {customer.first_name[0]}{customer.last_name[0]}
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-gray-900">{customer.first_name} {customer.last_name}</div>
-                          <div className="text-xs text-gray-500">Joined {new Date(customer.created_at).toLocaleDateString()}</div>
+                          <p className="text-sm font-bold text-white">{customer.first_name} {customer.last_name}</p>
+                          <p className="text-xs text-gray-500">Joined {new Date(customer.created_at).toLocaleDateString()}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 font-medium">{customer.email}</div>
-                      <div className="text-sm text-gray-500">{customer.phone || 'N/A'}</div>
+                    <td className={tdCls}>
+                      <p className="text-sm text-white">{customer.email}</p>
+                      <p className="text-xs text-gray-500">{customer.phone || 'N/A'}</p>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className={`${tdCls} text-sm text-gray-400`}>
                       {customer.city ? `${customer.city}, ${customer.state || ''}` : 'Not provided'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-50 text-blue-700 font-bold">
+                    <td className={`${tdCls} text-center`}>
+                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold" style={{ background: 'rgba(10,132,255,0.12)', color: '#0A84FF' }}>
                         {customer.totalBookings}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold tracking-wide uppercase ${
-                        customer.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
+                    <td className={`${tdCls} text-center`}>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${customer.status === 'Active' ? 'badge-completed' : 'badge-cancelled'}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${customer.status === 'Active' ? 'bg-green-400' : 'bg-red-400'}`} />
                         {customer.status}
                       </span>
                     </td>
