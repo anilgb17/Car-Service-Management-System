@@ -11,6 +11,7 @@ router.get('/dashboard', adminController.getDashboardMetrics);
 router.get('/bookings', adminController.getAllBookings);
 router.put('/bookings/:id/status', adminController.updateBookingStatus);
 router.get('/customers', adminController.getAllCustomers);
+router.delete('/customers/:id', adminController.deleteCustomer);
 
 const staffController = require('../controllers/staffController');
 router.get('/staff', staffController.getStaff);

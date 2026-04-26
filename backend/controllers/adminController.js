@@ -94,3 +94,30 @@ exports.getAllCustomers = async (req, res) => {
     res.status(500).json({ message: 'Error fetching customers' });
   }
 };
+
+exports.deleteCustomer = async (req, res) => {
+  try {
+    const customer = await User.findOne({
+      where: { 
+        user_id: req.params.id,
+        role: 'Customer'
+      }
+    });
+    
+    if (!customer) {
+      return res.status(404).json({ message: 'Customer not found' });
+    }
+
+    // Delete associated records first (cascade delete)
+    await Booking.destroy({ where: { customer_id: req.params.id } });
+    await Vehicle.destroy({ where: { customer_id: req.params.id } });
+    
+    // Delete the customer
+    await customer.destroy();
+    
+    res.json({ message: 'Customer deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error deleting customer' });
+  }
+};

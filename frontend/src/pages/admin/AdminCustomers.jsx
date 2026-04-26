@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
 import useAdminStore from '../../store/adminStore';
-import { Search, UsersRound } from 'lucide-react';
+import { Search, UsersRound, Trash2 } from 'lucide-react';
 
 export default function AdminCustomers() {
-  const { allCustomers, fetchAllCustomers, isLoading } = useAdminStore();
+  const { allCustomers, fetchAllCustomers, deleteCustomer, isLoading } = useAdminStore();
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => { fetchAllCustomers(); }, [fetchAllCustomers]);
+
+  const handleDelete = async (id, name) => {
+    if (window.confirm(`Are you sure you want to delete ${name}? This will also delete all their bookings and vehicles.`)) {
+      await deleteCustomer(id);
+    }
+  };
 
   const filteredCustomers = allCustomers.filter(c =>
     c.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -52,6 +58,7 @@ export default function AdminCustomers() {
                   <th>Location</th>
                   <th className="text-center">Bookings</th>
                   <th className="text-center">Status</th>
+                  <th className="text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -85,6 +92,16 @@ export default function AdminCustomers() {
                         <span className={`w-1.5 h-1.5 rounded-full ${customer.status === 'Active' ? 'bg-green-400' : 'bg-red-400'}`} />
                         {customer.status}
                       </span>
+                    </td>
+                    <td className="text-center">
+                      <button 
+                        onClick={() => handleDelete(customer.user_id, `${customer.first_name} ${customer.last_name}`)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:bg-red-500/10 transition font-medium text-sm"
+                        title="Delete customer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}
