@@ -23,30 +23,33 @@ export default function AdminStaff() {
   const inputStyle = { background: '#2A2A2A', border: '1.5px solid #374151', color: '#E5E7EB', borderRadius: '8px', padding: '10px 14px', outline: 'none', width: '100%' };
 
   return (
-    <div>
+    <div className="ac-enter">
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Staff Management</h1>
           <p className="text-gray-400 mt-1">Manage service center employees and roles.</p>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center gap-2 px-5 py-2.5">
+        <button onClick={() => setIsModalOpen(true)} className="btn-premium btn-premium-primary">
           <Plus className="h-4 w-4" /> Add Staff
         </button>
       </div>
 
       {isLoading && allStaff.length === 0 ? (
-        <div className="text-center py-10 text-gray-500">Loading staff...</div>
+        <div className="p-12 text-center">
+          <div className="spinner-premium mx-auto mb-4"></div>
+          <p className="text-secondary">Loading staff...</p>
+        </div>
       ) : allStaff.length === 0 ? (
-        <div className="dark-card p-12 text-center">
+        <div className="card-premium p-12 text-center ac-fade-in">
           <UsersRound className="h-12 w-12 text-gray-700 mx-auto mb-4" />
           <p className="text-gray-500">No staff members found.</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {allStaff.map((staff) => {
+          {allStaff.map((staff, index) => {
             const roleColor = ROLE_COLORS[staff.role] || '#6B7280';
             return (
-              <div key={staff.user_id} className="dark-card p-5">
+              <div key={staff.user_id} className="card-premium p-5 ac-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg" style={{ background: `${roleColor}22`, border: `2px solid ${roleColor}44`, color: roleColor }}>
@@ -73,7 +76,7 @@ export default function AdminStaff() {
                     </div>
                   )}
                 </div>
-                <div className="mt-4 pt-3 flex items-center justify-between" style={{ borderTop: '1px solid #2D2D2D' }}>
+                <div className="mt-4 pt-3 flex items-center justify-between" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
                   <span className="text-xs text-gray-600">Status</span>
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-400" /> Active
@@ -87,9 +90,9 @@ export default function AdminStaff() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
-          <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style={{ background: '#1E1E1E', border: '1px solid #2D2D2D' }}>
-            <div className="flex justify-between items-center px-6 py-4" style={{ borderBottom: '1px solid #2D2D2D' }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 ac-fade-in" style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)' }}>
+          <div className="w-full max-w-md card-glass overflow-hidden shadow-2xl ac-scale-in">
+            <div className="flex justify-between items-center px-6 py-4" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
               <h2 className="text-lg font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Add Staff Member</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white transition"><X className="h-5 w-5" /></button>
             </div>
@@ -97,24 +100,24 @@ export default function AdminStaff() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-gray-400 mb-1.5">First Name</label>
-                  <input required type="text" style={inputStyle} value={formData.first_name} onChange={e => setFormData({...formData, first_name: e.target.value})} />
+                  <input required type="text" className="input-premium" value={formData.first_name} onChange={e => setFormData({...formData, first_name: e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-400 mb-1.5">Last Name</label>
-                  <input required type="text" style={inputStyle} value={formData.last_name} onChange={e => setFormData({...formData, last_name: e.target.value})} />
+                  <input required type="text" className="input-premium" value={formData.last_name} onChange={e => setFormData({...formData, last_name: e.target.value})} />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1.5">Email</label>
-                <input required type="email" style={inputStyle} value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                <input required type="email" className="input-premium" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1.5">Phone</label>
-                <input required type="tel" style={inputStyle} value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                <input required type="tel" className="input-premium" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1.5">Role</label>
-                <select required style={inputStyle} value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}>
+                <select required className="input-premium" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}>
                   <option value="Mechanic">Mechanic</option>
                   <option value="Service Advisor">Service Advisor</option>
                   <option value="Manager">Manager</option>
@@ -122,8 +125,8 @@ export default function AdminStaff() {
               </div>
               <p className="text-xs text-gray-600">Default password: "password123"</p>
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">Cancel</button>
-                <button type="submit" disabled={isLoading} className="btn-primary px-5 py-2 text-sm">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="btn-premium btn-premium-secondary">Cancel</button>
+                <button type="submit" disabled={isLoading} className="btn-premium btn-premium-primary">
                   {isLoading ? 'Saving...' : 'Add Staff'}
                 </button>
               </div>

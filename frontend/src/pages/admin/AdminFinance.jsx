@@ -40,28 +40,30 @@ export default function AdminFinance() {
   ];
 
   return (
-    <div>
+    <div className="ac-enter">
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Financial Overview</h1>
           <p className="text-gray-400 mt-1">Track revenue and financial performance.</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition" style={{ background: '#2A2A2A', border: '1px solid #374151', color: '#E5E7EB' }}>
+        <button className="btn-premium btn-premium-secondary">
           <Download className="h-4 w-4" /> Export Report
         </button>
       </div>
 
-      <div className="grid sm:grid-cols-3 gap-5 mb-8">
+      <div className="grid sm:grid-cols-3 gap-6 mb-10">
         {kpiCards.map((card, i) => {
           const Icon = card.icon;
           return (
-            <div key={i} className="dark-card p-5 flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: card.bg }}>
-                <Icon className="h-7 w-7" style={{ color: card.color }} />
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">{card.label}</p>
-                <p className="text-2xl font-bold text-white">{card.value}</p>
+            <div key={i} className="kpi-card-premium ac-scale-in" style={{ animationDelay: `${i * 0.1}s` }}>
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: card.bg }}>
+                  <Icon className="h-7 w-7" style={{ color: card.color }} />
+                </div>
+                <div>
+                  <p className="text-sm text-secondary uppercase tracking-wider mb-1">{card.label}</p>
+                  <p className="text-2xl font-bold count-up">{card.value}</p>
+                </div>
               </div>
             </div>
           );
@@ -70,7 +72,7 @@ export default function AdminFinance() {
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Pie Chart */}
-        <div className="dark-card p-6">
+        <div className="card-premium p-6 ac-fade-in">
           <h2 className="text-lg font-bold text-white mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>Revenue by Category</h2>
           <div className="h-64">
             {pieData.length > 0 ? (
@@ -91,8 +93,8 @@ export default function AdminFinance() {
         </div>
 
         {/* Recent Transactions */}
-        <div className="dark-card flex flex-col overflow-hidden">
-          <div className="p-5" style={{ borderBottom: '1px solid #2D2D2D' }}>
+        <div className="card-premium flex flex-col overflow-hidden ac-fade-in" style={{ animationDelay: '0.1s' }}>
+          <div className="p-5" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <h2 className="text-lg font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Recent Transactions</h2>
           </div>
           <div className="flex-1 overflow-y-auto p-3">
@@ -100,8 +102,8 @@ export default function AdminFinance() {
               <div className="p-8 text-center text-gray-500">No completed transactions yet.</div>
             ) : (
               <div className="space-y-1">
-                {completedBookings.slice(0, 8).map((booking) => (
-                  <div key={booking.booking_id} className="flex justify-between items-center p-3 rounded-xl hover:bg-white/3 transition">
+                {completedBookings.slice(0, 8).map((booking, index) => (
+                  <div key={booking.booking_id} className="flex justify-between items-center p-3 rounded-xl hover:bg-white/3 transition ac-fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(74,222,128,0.12)' }}>
                         <DollarSign className="h-4 w-4 text-green-400" />
